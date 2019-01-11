@@ -1,0 +1,169 @@
+package com.zt.jinanzf.monitor.push.service.impl;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zt.jinanzf.common.util.DateUtil;
+import com.zt.jinanzf.monitor.push.mapper.HWPushMapper;
+import com.zt.jinanzf.monitor.push.model.PushUser;
+import com.zt.jinanzf.monitor.push.service.HuaWeiService;
+import com.zt.jinanzf.monitor.push.tool.HWPush;
+import com.zt.jinanzf.monitor.record.service.PushRecordService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.*;
+
+/**
+ * 华为推送
+ */
+@Service
+public class HuaWeiServiceImpl implements HuaWeiService {
+
+
+    @Autowired
+    HWPushMapper hwPushMapper;
+
+
+    @Autowired
+    PushRecordService pushRecordService;
+
+    @Override
+    public int hwSendPush(Map<String, Object> params) {
+        try {
+            //推送用户处理
+            JSONArray deviceTokens = new JSONArray();//token储存
+            int x = 0;
+            //判断是否有用户id
+            List<PushUser> pushUsersx=new ArrayList<>();
+            if (params.get("pushUserIds") != null && !"".equals(params.get("pushUserIds"))) {
+                String pushUserIds = params.get("pushUserIds").toString();
+                String[] strs = pushUserIds.split(",");
+                for (int i = 0; i < strs.length; i++) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("user_id", strs[i]);
+                    List<PushUser> pushUsers = hwPushMapper.selectByMap(map);
+                    pushUsersx.addAll(pushUsers);
+                    if (pushUsers.size() > 0)
+                        deviceTokens.add(pushUsers.get(i).getPushToken());
+                }
+                x++;
+            }
+            //判断是否有角色
+            if (params.get("deptIds") != null && !"".equals(params.get("deptIds"))) {
+                String deptIds = params.get("deptIds").toString();
+                String[] strs = deptIds.split(",");
+                for (int i = 0; i < strs.length; i++) {
+                    //通过角色查华为token信息
+                    List<String> hwTokens = hwPushMapper.getTokenByRole(Integer.parseInt(strs[i]));
+                    if (hwTokens.size() > 0) {
+                        for (int j = 0; j < hwTokens.size(); j++) {
+                            deviceTokens.add(hwTokens.get(j));
+                        }
+                    }
+                }
+                x++;
+            }
+            //没有传来用户和角色信息为全部发送
+            if (x == 0) {
+                List<PushUser> pushUsers = hwPushMapper.selectList(null);
+                if (pushUsers.size() > 0) {
+                    pushUsersx.addAll(pushUsers);
+                    for (int i = 0; i < pushUsers.size(); i++) {
+                        deviceTokens.add(pushUsers.get(i).getPushToken());
+                    }
+                }
+            }
+
+            //推送点击动作
+            JSONObject param = new JSONObject();
+            if ("2".equals(params.get("msgTypeId").toString())) {
+                param.put("appPkgName", "com.zt.capacity.jinan_zwt");
+            } else {//默认为通知类消息
+                param.put("appPkgName", "com.zt.capacity.jinan_zwt");
+//                param.put("intent", "#Intent;compo=com.rvr/.Activity;S.W=U;end");
+            }
+            //自定义扩展消息
+            JSONObject ext = new JSONObject();
+            if (params.get("pushImg") != null && !"".equals(params.get("pushImg"))) {
+                ext.put("icon", params.get("pushImg").toString());
+            }
+            System.out.println("token=====" + deviceTokens.get(0) + "");
+            try {
+                HWPush.getInstance().sendPushMessage(deviceTokens, params.get("pushTitle").toString(), params.get("pushContent").toString(), 3, 3, param, ext);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return 1;
+            }
+            //推送成功保存推送记录
+            System.out.println("保存数量"+pushUsersx.size());
+            if (pushUsersx.size() > 0){
+                params.put("pushState",0);
+                params.put("pushDataId",params.get("dataId"));
+                params.put("pushRecordTime",DateUtil.showDate(DateUtil.DATE_FORMAT_YMDHMS,new Date()));
+                params.put("pushRecordContent",params.get("pushContent"));
+                params.put("pushRecordTitle",params.get("pushTitle"));
+                params.put("pushGenreId",params.get("msgTypeId"));
+                for (int i = 0; i < pushUsersx.size(); i++) {
+                    params.put("quiltUserId",pushUsersx.get(i).getUserId());
+                    pushRecordService.setPushRecord(params);
+                }
+            }
+            return 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return 1;
+        }
+
+    }
+
+    @Override
+    public boolean selectToken(Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("user_id", params.get("userId"));
+        map.put("push_identify", params.get("pushIdentify"));//标识
+        List<PushUser> pushUsers = hwPushMapper.selectByMap(map);
+        if (pushUsers.size() > 0) {
+            PushUser pushUser = pushUsers.get(0);
+            Date date = DateUtil.addAndSubtractDaysByGetTime(pushUser.getPushTime(), 6);
+            int res = date.compareTo(new Date());
+            if (res == 1) {//有且没过期
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int addPushUser(Map<String, Object> params) {
+//        try {
+        String token = params.get("hwToken").toString();
+        Map<String, Object> map = new HashMap<>();
+        map.put("user_id", params.get("userId"));
+        List<PushUser> pushUsers = hwPushMapper.selectByMap(map);
+        if (pushUsers.size() > 0) {//判断
+            PushUser pushUser = pushUsers.get(0);
+            pushUser.setPushToken(token);
+            hwPushMapper.updateById(pushUser);
+        } else {
+            hwPushMapper.insert(PushUser.builder().pushIdentify(params.get("pushIdentify").toString()).pushBrand(params.get("pushBrand").toString()).pushToken(token).pushTime(new Date()).userId(Integer.parseInt(params.get("userId").toString())).build());
+        }
+        return 0;
+//        } catch (Exception e) {
+//            return 1;
+//        }
+    }
+
+    @Override
+    public int deletPushUser(Map<String, Object> params) {
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("push_hw_token", params.get("pushToken"));
+            hwPushMapper.deleteByMap(map);
+            return 0;
+        } catch (Exception e) {
+            return 1;
+        }
+    }
+
+}

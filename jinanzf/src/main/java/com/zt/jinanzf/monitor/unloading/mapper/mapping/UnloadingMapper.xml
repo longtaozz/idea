@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.unloading.mapper.UnloadingMapper">
+	<!-- 查询所有消纳场数量 -->
+	<select id="getUnloadingAreaCount" resultType="int">
+		select count(*) from zt_unloading_area where unloading_backfill != '封场'
+	</select>
+	<!-- 查询消纳场信息 -->
+	<select id="getNewUnloadingListForPage" resultType="com.zt.jinanzf.monitor.unloading.model.Unloading">
+		SELECT 
+			A.unloading_id unloadingId,
+			A.unloading_certificate unloadingCertificate,
+			A.unloading_name unloadingName,
+			A.unloading_address unloadingAddress,  
+			A.unloading_type unloadingType,
+			A.district_id districtId,
+			A.buildunit_id buildunitId,
+			B.build_representative buildRepresentative,  
+			B.build_phone buildPhone  
+			<!-- A.unloading_backfill  B.build_id ,B.build_name , --> 
+		FROM  
+			zt_unloading_area A 
+		LEFT JOIN zt_buildunit B ON A.buildunit_id = B.build_id 
+		where unloading_backfill != '封场'
+		<if test="null != unloadingName and unloadingName != ''">
+			And unloading_name like '%${unloadingName}%'
+		</if>
+		<if test="null != districtId and districtId !='' and districtId != 0">
+			and
+			 district_id = #{districtId} 
+		</if>
+		 ORDER BY unloadingId DESC 
+	</select>
+	<!-- 查询消纳场详细信息 -->
+	<select id="getUnloadingInfo" resultType="com.zt.jinanzf.monitor.unloading.model.Unloading">
+		select * from zt_unloading_area WHERE  unloading_id=#{unloadingId};
+	</select>
+</mapper>

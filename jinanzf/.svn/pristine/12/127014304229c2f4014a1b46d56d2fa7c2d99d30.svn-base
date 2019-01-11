@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.consapp.mapper.ConsappMapper">
+	<!-- 根据参数获取工地总数 -->
+	<select id="getAllConsappCount" resultType="int">
+		select count(*) from zt_consapp
+		where  1=1
+		<if test="null != enterpriseId and enterpriseId != '' and enterpriseId != 0">
+			AND  trans_id = #{enterpriseId}
+		</if>
+	</select>
+	
+	<select id="getNewConsappListForPage" resultType="com.zt.jinanzf.monitor.consapp.model.ConsappVo">
+		SELECT	A.consapp_id consappId, A.lic_number licNumber, 
+				A.pro_belong proBelong,
+				A.pro_name proName, A.pro_address proAddress, B.build_id buildId, 
+				B.build_name buildName, B.build_representative buildRepresentative, 
+				B.build_phone buildPhone  FROM 	zt_consapp A
+				LEFT JOIN zt_buildunit B ON A.constr_id = B.build_id 
+				where 1=1
+				<if test="null != proName and proName != ''">
+					AND  pro_name like '%${proName}%'
+				</if>
+				<if test="null != enterpriseId and enterpriseId != ''">
+					AND trans_id =#{enterpriseId}
+				</if>
+				 ORDER BY consappId DESC
+	</select>
+	
+	
+	<select id="getConsappInfo" resultType="com.zt.jinanzf.monitor.consapp.model.ConsappVo">
+		select * from zt_consapp where consapp_id = #{consappId}
+	</select>
+	
+	<select id="getConsappInfoByPos" resultType="com.zt.jinanzf.monitor.consapp.model.ConsappVo"> 
+		SELECT	A.consapp_id consappId, A.lic_number licNumber, 
+				A.pro_belong proBelong,
+				A.pro_name proName, A.pro_address proAddress, B.build_id buildId, 
+				B.build_name buildName, B.build_representative buildRepresentative, 
+				B.build_phone buildPhone  FROM 	zt_consapp A
+				LEFT JOIN zt_buildunit B ON A.constr_id = B.build_id 
+				LEFT JOIN zt_gpsfence c ON A.gong_guid_fence = c.guid_fence 
+				where 1=1 
+				and consapp_id = #{consappId} 
+				ORDER BY consappId DESC
+	</select>
+	
+	<select id="getConsappInfos" resultType="com.zt.jinanzf.monitor.consapp.model.Consapp">
+		select * from zt_consapp where consapp_id = #{consappId}
+	</select>
+</mapper>

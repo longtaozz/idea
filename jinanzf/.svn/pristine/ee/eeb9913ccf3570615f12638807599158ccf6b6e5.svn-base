@@ -1,0 +1,58 @@
+/** 
+ *@Project: jinanzf 
+ *@Author: YangXiao
+ *@Date: 2018年11月23日 
+ *@Copyright: ©2016-2022 http://www.zhtkj.com Inc. All rights reserved. 
+ */    
+package com.zt.jinanzf.monitor.record.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.zt.jinanzf.monitor.record.mapper.PushRecordMapper;
+import com.zt.jinanzf.monitor.record.model.PushRecord;
+import com.zt.jinanzf.monitor.record.model.PushRecordVo;
+import com.zt.jinanzf.monitor.record.service.PushRecordService;
+
+/**
+ * ClassName: PushRecordServiceImpl 
+ * @Description: TODO
+ * @author YangXiao
+ * @date 2018年11月23日
+ */
+
+public class PushRecordServiceImpl   implements  PushRecordService{
+
+	@Autowired
+	protected PushRecordMapper pushRecordMapper;
+	
+	/**
+	 * (non-Javadoc)
+	 * @see com.zt.jinanzf.monitor.record.service.PushRecordService#setPushRecord(java.util.Map)
+	 */
+	public int setPushRecord(Map<String, Object> map) {
+		//PushRecord  pushRecord =(PushRecord) map.get("pushRecord");
+		return pushRecordMapper.setPushRecord(map);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * @see com.zt.jinanzf.monitor.record.service.PushRecordService#upPushRecord(java.util.Map)
+	 */
+	public int upPushRecord(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * @see com.zt.jinanzf.monitor.record.service.PushRecordService#getPushRecordVo(java.util.Map)
+	 */
+	public List<PushRecordVo> getPushRecordVo(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return pushRecordMapper.getPushRecordVo(map);
+	}
+
+}

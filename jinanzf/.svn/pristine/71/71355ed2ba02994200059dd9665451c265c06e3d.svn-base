@@ -1,0 +1,168 @@
+/** 
+  *@Project: jinan-service 
+ *@Author: YangXiao
+ *@Date: 2018年9月27日 
+ *@Copyright: ©2016-2022 http://www.zhtkj.com Inc. All rights reserved. 
+ */    
+package com.zt.jinanzf.monitor.card.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.baomidou.mybatisplus.plugins.Page;
+import com.zt.jinanzf.common.util.TokenUtil;
+import com.zt.jinanzf.common.util.UserUtil;
+import com.zt.jinanzf.monitor.card.model.Card;
+import com.zt.jinanzf.monitor.card.service.CardService;
+import com.zt.jinanzf.monitor.user.model.User;
+import com.zt.jinanzf.monitor.user.service.UserInfoService;
+
+import io.swagger.annotations.ApiOperation;
+
+/**
+ * ClassName: CardController 
+ * @Description: TODO
+ * @author YangXiao
+ * @date 2018年9月27日 
+ */
+@RestController
+@RequestMapping(value = "/project/card")
+public class CardController {
+
+	
+	@Autowired
+	private UserInfoService userInfoService;
+	
+	@Autowired
+	private TokenUtil tokenUtil;
+	
+	@Autowired
+	private HttpServletRequest request;
+	
+ 	@Value("${jwt.token.header}")
+	protected String header;
+ 	
+ 	@Autowired
+ 	private   CardService  cardService; 
+ 	
+	@Autowired
+	private  UserUtil   userUtil;
+	
+	/**
+	 * 运输公司有效核准证数
+	 * effective :  1：查询有效得核准证2：查询无效得核准证0：查询所有
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getTotalCard", method = RequestMethod.POST)
+	public  Integer  getTotalCard(@RequestBody Map<String,Object> params){
+		String [] uid = tokenUtil.getUsercodeFromToken(request.getHeader(this.header)).split(",");//获得token数据
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("uid", uid[0]);
+		User userObj = userInfoService.getUserInfo(map);
+		String enterpriseId = userObj.getEnterpriseId().toString();
+		params.put("enterpriseId", enterpriseId);	//运输公司id
+		Integer effective = 1;
+		params.put("effective", effective);
+		return  cardService.getTotalCard(params);
+	}
+
+	@ResponseBody
+	@ApiOperation(value = "查看指定運輸公司核准証")
+	@RequestMapping(value = "/getEnterpriseCardPage", method = RequestMethod.POST)
+	public ResponseEntity<Page<Card>> getEnterpriseCardPage(@RequestBody Map<String,Object> params) {
+		User  userObj = userUtil.getYlUserInfo();
+		String enterpriseId = userObj.getEnterpriseId().toString();
+		params.put("enterpriseId", enterpriseId);
+		
+		if(null == params.get("effective") ){//如果前臺沒帶參數  則查詢有效的核准証
+			Integer effective = 1;
+			params.put("effective", effective);
+		}
+		
+		Integer current = null == params.get("current") || params.get("current").equals("")? 1 :(Integer)params.get("current");
+		Integer size =  null == params.get("size") || params.get("size").equals("")? 10 :(Integer)params.get("size");
+		Page<Card> page = new Page<Card>(current,size);
+		Page<Card> cardAllInfo = cardService.getEnterpriseCardPlate(page, params); 
+		if(null != cardAllInfo)
+			return new ResponseEntity<Page<Card>>(cardAllInfo,HttpStatus.OK);
+			return new ResponseEntity<Page<Card>>(HttpStatus.NOT_FOUND);
+	}
+	
+	/**
+	 * 
+	 * @Description: 扫一扫根据Id获取小证车辆数据
+	 * @param params
+	 * @return ResponseEntity<Card>  
+	 * @author chenlijun
+	 * @date 2018年11月12日
+	 */
+	@RequestMapping(value = "/certificatePointCar", method = RequestMethod.POST)
+	public ResponseEntity<Card> certificatePointCar(@RequestBody Map<?, ?> params
+			) {
+		//Integer cityId = null == params.get("cityId") || params.get("cityId").equals("")? 0 :(Integer)params.get("cityId");
+		Card card = cardService.getCardInfoById(params.get("cardId").toString());
+		// 设置时间
+		/*if (null == card.getLicEndtime()) {
+			model.addAttribute("hours", "早01点&nbsp;&nbsp;晚23点");
+		}*/
+		/**
+		 * 设置开始日期显示
+		 */
+		/*Date startDate = (Date) card.getTranStarttime();
+		Calendar start = Calendar.getInstance();
+		start.setTime(startDate);
+		int year1 = start.get(Calendar.YEAR);
+		model.addAttribute("year1", year1);
+		int startMonth = start.get(Calendar.MONTH);
+		if (startMonth < 10) {
+			model.addAttribute("month1", "0" + startMonth);
+		} else {
+			model.addAttribute("month1", startMonth);
+		}
+		int startDay = start.get(Calendar.DAY_OF_MONTH);
+		if (startDay < 10) {
+			model.addAttribute("day1", "0" + startDay);
+		} else {
+			model.addAttribute("day1", startDay);
+		}*/
+		/**
+		 * 设置结束日期显示
+		 */
+		/*Date endDate = (Date) card.get("endTime");
+		Calendar end = Calendar.getInstance();
+		end.setTime(endDate);
+		int year2 = end.get(Calendar.YEAR);
+		model.addAttribute("year2", year2);
+		int endMonth = end.get(Calendar.MONTH);
+		if (endMonth < 10) {
+			model.addAttribute("month2", "0" + endMonth);
+		} else {
+			model.addAttribute("month2", endMonth);
+		}
+		int endDay = end.get(Calendar.DAY_OF_MONTH);
+		if (endDay < 10) {
+			model.addAttribute("day2", "0" + endDay);
+		} else {
+			model.addAttribute("day2", endDay);
+		}
+
+		if (card.get("LuName") == null || "".equals("LuName")) {
+			card.put("LuName", card.get("LuName"));
+		}*/
+		
+		//model.addAttribute("cardId", cardId);
+		return new ResponseEntity<Card>(card, HttpStatus.OK);
+	}
+}

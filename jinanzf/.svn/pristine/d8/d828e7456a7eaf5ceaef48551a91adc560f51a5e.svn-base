@@ -1,0 +1,51 @@
+package com.zt.jinanzf.monitor.buildunit.model;
+
+import java.io.Serializable;
+
+import lombok.Data;
+
+import java.util.Date;
+
+
+/**
+ * The persistent class for the zt_buildunit database table.
+ * 
+ */
+@Data
+public class ZtBuildunit implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	private int buildId;
+
+	private String build_addPeople;
+	
+	private String buildGUID;
+
+	private String buildAddress;
+
+	private Date build_addTime;
+
+	private int build_districtId;
+
+	private String buildFile;
+
+	private String buildName;
+
+	private String buildPhone;
+
+	private String buildRepresentative;
+
+	private String buildStatus;
+
+	private String build_updatePeople;
+
+	private Date build_updateTime;
+	
+	private Integer cityId;
+
+	private String remark;
+	
+	private String contacts;
+	
+	private String contactsPhone;
+}

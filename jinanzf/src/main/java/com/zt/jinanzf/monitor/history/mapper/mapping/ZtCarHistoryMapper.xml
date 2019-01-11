@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.history.mapper.ZtCarHistoryMapper">
+	<select id="selectCarHistory" parameterType="java.util.Map" resultType="com.zt.jinanzf.monitor.history.model.CarHistory">
+		SELECT 
+			history_id AS historyId,
+			dev_phone AS devPhone,
+			gps_pos_x AS gpsPosX,
+			gps_pos_y AS gpsPosY,
+			gps_speed AS gpsSpeed,
+			gps_height AS gpsHeight,
+			gps_direct AS gpsDirect,
+			gps_valid AS gpsValid,
+			box_up AS boxUp,
+			box_empty AS boxEmpty,
+			box_close AS boxClose,
+			car_number AS carNumber,
+			car_state AS carState,
+			car_weigui AS carWeigui,
+			driver_id AS driverId,
+			send_datetime AS sendDatetime,
+			revice_datetime AS reviceDatetime
+		FROM 
+			zt_car_history_${strMonth} a
+		WHERE 
+			gps_pos_x &gt; 10
+		and 
+			gps_pos_y &gt; 10 
+		<choose>
+			<when test="carNumber != null and carNumber != ''">
+				and 
+					a.car_number in(${carNumber}) 
+				and 
+					a.send_datetime &gt;= ${starTime}
+				and 
+					a.send_datetime &lt;= ${enTime} 
+			</when>
+			<otherwise>
+				and 
+					1 = 2
+			</otherwise>
+		</choose>
+				order by 
+					send_datetime asc
+	</select>
+	<select id="selectCarHistoryByHour" parameterType="java.util.Map" resultType="com.zt.jinanzf.monitor.history.model.CarHistory">
+		SELECT 
+			send_datetime AS sendDatetime
+		FROM 
+			zt_car_history_${strMonth} a
+		WHERE 
+			a.car_number = ${numberPlate}
+				order by 
+					send_datetime desc 
+				limit 0,1
+	</select>
+	<select id="selectCarHistoryListByHour" parameterType="java.util.Map" resultType="com.zt.jinanzf.monitor.history.model.CarHistory">
+		SELECT 
+			history_id AS historyId,
+			dev_phone AS devPhone,
+			gps_pos_x AS gpsPosX,
+			gps_pos_y AS gpsPosY,
+			gps_speed AS gpsSpeed,
+			gps_height AS gpsHeight,
+			gps_direct AS gpsDirect,
+			gps_valid AS gpsValid,
+			box_up AS boxUp,
+			box_empty AS boxEmpty,
+			box_close AS boxClose,
+			car_number AS carNumber,
+			car_state AS carState,
+			car_weigui AS carWeigui,
+			driver_id AS driverId,
+			send_datetime AS sendDatetime,
+			revice_datetime AS reviceDatetime
+		FROM 
+			zt_car_history_${strMonth} a
+		WHERE 
+			gps_pos_x &gt; 10
+		and 
+			gps_pos_y &gt; 10 
+		<if test="null != time and time != ''">
+				and 
+					a.car_number = ${numberPlate}
+				and 
+					a.send_datetime &lt;= ${time} 
+				and 
+					a.send_datetime &gt;= DATE_ADD(${time},INTERVAL -${hour} HOUR) 
+		</if> 
+				order by 
+					send_datetime asc
+	</select>
+	<!-- <select id="getZtCarHistoryListByCarNumber" resultType="com.zt.jinanzf.monitor.history.model.CarHistory" parameterType="java.util.Map">
+		SELECT 
+			gps_pos_x AS gpsPosX,
+			gps_pos_y AS gpsPosY,
+			gps_speed AS gpsSpeed,
+			gps_height AS gpsHeight,
+			gps_direct AS gpsDirect,
+			gps_valid AS gpsValid,
+			box_up AS boxUp,
+			box_empty AS boxEmpty,
+			box_close AS boxClose,
+			car_number AS carNumber,
+			car_state AS carState,
+			car_weigui AS carWeigui,
+			driver_id AS driverId,
+			send_datetime AS sendDatetime,
+			revice_datetime AS reviceDatetime
+		FROM 
+			zt_car_history_#{strMonth} 
+		WHERE 
+			1 = 1 "
+		<if test="carNumberList.size()>0">
+			 and car_number in 
+			 <foreach collection="carNumberList" open="(" separator="," close=")" item="carNumber">
+			 	#{carNumber}
+			 </foreach>
+		</if>
+		<if test="startTime != null">
+			 and send_datetime &gt; #{startTime}
+		</if>
+		<if test="endTime != null">
+			and send_datetime &gt; #{endTime}		
+		</if>
+			and gps_pos_x not like '0.000%'
+			group by gps_pos_x,gps_pos_y,box_up order by send_datetime asc
+	</select> -->
+</mapper>

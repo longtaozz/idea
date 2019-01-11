@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.district.mapper.DistrictMapper">
+	<select id="getDistrict" resultType="com.zt.jinanzf.monitor.district.model.ZtDistrict">
+		select * from zt_district where district_id = #{proBelong} order by district_order
+	</select>
+	<select id="getDistrictByCityId" resultType="com.zt.jinanzf.monitor.district.model.ZtDistrict">
+		select district_name as districtName,district_id as districtId  from zt_district where city_id = #{cityId} order by district_order
+	</select>
+</mapper>

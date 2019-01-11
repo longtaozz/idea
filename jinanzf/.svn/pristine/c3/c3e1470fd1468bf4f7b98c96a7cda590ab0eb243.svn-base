@@ -1,0 +1,115 @@
+/**
+ * @Project: jinanzf
+ * @Author: YangXiao
+ * @Date: 2018年11月23日
+ * @Copyright: ©2016-2022 http://www.zhtkj.com Inc. All rights reserved.
+ */
+package com.zt.jinanzf.monitor.record.controller;
+
+import com.baomidou.mybatisplus.plugins.Page;
+import com.zt.jinanzf.common.util.CheckTokenUtil;
+import com.zt.jinanzf.common.util.TokenUtil;
+import com.zt.jinanzf.monitor.record.model.PushRecordVo;
+import com.zt.jinanzf.monitor.record.service.PushRecordService;
+import com.zt.jinanzf.monitor.user.model.User;
+import com.zt.jinanzf.monitor.user.service.UserInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
+
+/**
+ * ClassName: PushRecordController 
+ * @Description: TODO
+ * @author YangXiao
+ * @date 2018年11月23日
+ */
+@RestController
+@RequestMapping(value = "project/pushrecord")
+public class PushRecordController {
+
+    @Autowired
+    private PushRecordService pushRecordService;
+
+    @Autowired
+    private static CheckTokenUtil checkTokenUtil;
+
+    @Value("${jwt.token.header}")
+    protected String header;
+
+    @Autowired
+    private TokenUtil tokenUtil;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private UserInfoService userService;
+
+    /**
+     * 推送消息保存
+     * @Description: TODO
+     * @param map
+     * @return
+     * @return int
+     * @throws
+     * @author YangXiao
+     * @date 2018年11月23日
+     */
+
+    @RequestMapping(value = "setPushRecord", method = RequestMethod.POST)
+    public Object setPushRecord(@RequestBody Map<String, Object> map) {
+        String name = tokenUtil.getUsercodeFromToken(request.getHeader(this.header));
+        //String devicename = map.get("device").toString();
+        //System.out.println(request.getHeader(this.header));
+		/*if(!CheckTokenUtil.existByDevice(name, devicename)){
+			if(!CheckTokenUtil.existByToken(name, request.getHeader(this.header))){
+				return new ResponseEntity<Object>("帐号已在别的地方登录！", HttpStatus.OK);
+			}
+		}*/
+		/*PushRecord  pushRecord  = new PushRecord();
+		 * pushRecordId
+		pushRecord.setPushGenreId((Integer)map.get("pushGenreId"));
+		pushRecord.setPushGenreName(map.get("pushGenreName").toString());
+		pushRecord.setPushRecordTitle(map.get("pushRecordTitle").toString());
+		pushRecord.setPushRecordContent(map.get("pushRecordContent").toString());
+		pushRecord.setPushRecordTime((Date)map.get("pushRecordTime"));
+		pushRecord.setUserId((Integer)map.get("userId"));
+		pushRecord.setQuiltUserId((Integer)map.get("quiltUserId"));
+		pushRecord.setPushState((Integer)map.get("pushState"));
+		pushRecord.setPushDataId((Integer)map.get("pushDataId"));
+		Map<String, Object> pushRecordMap =  new HashMap<String, Object>();  
+		pushRecordMap.put("pushRecord", pushRecord);*/
+        System.out.println("--->");
+        return pushRecordService.setPushRecord(map);
+    }
+
+    @RequestMapping(value = "upPushRecord")
+    public ResponseEntity<Integer> upPushRecord(@RequestBody Map<String, Object> map) {
+
+        pushRecordService.upPushRecord(map);
+        return new ResponseEntity<Integer>(0, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "getPushRecordVo")
+    public ResponseEntity<Page<PushRecordVo>> getPushRecordVo(@RequestBody Map<String, Object> params) {
+        Integer current = null == params.get("current") || params.get("current").equals("") ? 1 : (Integer) params.get("current");
+        Integer size = null == params.get("size") || params.get("size").equals("") ? 10 : (Integer) params.get("size");
+
+        String[] uid = tokenUtil.getUsercodeFromToken(request.getHeader(this.header)).split(",");//获得token数据
+        User userObj = userService.queryPwd(uid[0]);
+        params.put("quiltUserId", userObj.getUserId());
+
+        Page<PushRecordVo> page = new Page<>(current, size);
+        Page<PushRecordVo> pushInfo = pushRecordService.getPushRecordVo(page, params);
+
+        return new ResponseEntity<Page<PushRecordVo>>(pushInfo, HttpStatus.OK);
+    }
+}

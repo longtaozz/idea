@@ -1,0 +1,104 @@
+/** 
+ *@Project: jinan-service 
+ *@Author: chenlijun
+ *@Date: 2018年9月18日 
+ *@Copyright: ©2016-2022 http://www.zhtkj.com Inc. All rights reserved. 
+ */    
+package com.zt.jinanzf.monitor.carIllegal.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.baomidou.mybatisplus.plugins.Page;
+import com.zt.jinanzf.monitor.carIllegal.model.ZtInfringeInfo;
+import com.zt.jinanzf.monitor.carIllegal.service.CarIllegalService;
+import com.zt.jinanzf.monitor.carruntime.model.CarRuntime;
+
+import io.swagger.annotations.ApiOperation;
+
+/**
+ * ClassName: CarIllegalController 
+ * @Description: 违法违规信息及车辆违规API
+ * @author chenlijun
+ * @date 2018年9月18日
+ */
+
+@RestController
+@RequestMapping(value="/project/carIllegal")
+public class CarIllegalController {
+	
+	@Autowired
+	private CarIllegalService carIllegalService;
+	
+	@Value("${jwt.token.header}")
+	protected String header;
+	
+	/**
+	 * @Description: 查询所有违法违规次数
+	 * @return Integer  
+	 * @author chenlijun
+	 * @date 2018年7月31日
+	 */
+	@ApiOperation(value = "查询所有违法违规次数")
+	@RequestMapping(value="/getAllCarIllegalCount",method = RequestMethod.GET)
+	public Integer getAllCarIllegalCount() {
+		return carIllegalService.getAllCarIllegalCount();
+	}
+	
+	/**
+	 * @Description: 查询所有违法违规数据
+	 * @return Integer  
+	 * @author chenlijun
+	 * @date 2018年7月31日
+	 */
+	@ApiOperation(value = "查询所有违法违规数据")
+	@RequestMapping(value="/getNewCarIllegalListForPage",method = RequestMethod.POST)
+	public ResponseEntity<Page<ZtInfringeInfo>> getNewCarIllegalListForPage(@RequestBody Map<?,?> params) {
+		Integer current = null == params.get("current") || params.get("current").equals("")? 1 :(Integer)params.get("current");
+		Integer size =  null == params.get("size") || params.get("size").equals("")? 10 :(Integer)params.get("size");
+		Page<ZtInfringeInfo> page = new Page<ZtInfringeInfo>(current, size);
+		Page<ZtInfringeInfo> ztInfringeInfo = carIllegalService.getNewCarIllegalListForPage(page,params);
+		return new ResponseEntity<>(ztInfringeInfo,HttpStatus.OK);
+	}
+	
+	/**
+	 * 查询违法违规详细信息（企业和单个车）
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getCarIllegalInfo", method = RequestMethod.POST)
+	public ResponseEntity<ZtInfringeInfo> getCarIllegalInfo(@RequestBody Map<?,?> params) {
+		String id = null == params.get("id")?null:params.get("id").toString();
+		//String cityId = null == params.get("cityId")?null:params.get("cityId").toString();
+		//String proBelong = null == params.get("proBelong")?null:params.get("proBelong").toString();
+		ZtInfringeInfo  ztInfringeInfo= carIllegalService.getCarIllegalInfo(id);
+		if(null != ztInfringeInfo){
+		return new ResponseEntity<ZtInfringeInfo>(ztInfringeInfo,HttpStatus.OK);
+	
+		}
+	return new ResponseEntity<ZtInfringeInfo>(ztInfringeInfo,HttpStatus.NOT_FOUND);
+	}
+	/**
+	 * 查询周边违规信息
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getAroundCarIllegalInfo", method = RequestMethod.POST)
+	public ResponseEntity<List<CarRuntime>> getAroundCarIllegalInfo(@RequestBody Map<?,?> params) {
+		List<CarRuntime> zt = carIllegalService.getAroundCarIllegalInfo(params);
+		if(null != zt){
+		return new ResponseEntity<List<CarRuntime>>(zt,HttpStatus.OK);
+	
+		}
+	return new ResponseEntity<List<CarRuntime>>(zt,HttpStatus.NOT_FOUND);
+	}
+	
+}

@@ -1,0 +1,67 @@
+package com.zt.jinanzf.monitor.company.model;
+
+import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.zt.jinanzf.monitor.district.model.ZtDistrict;
+
+import lombok.Data;
+
+@Data
+@TableName("zt_transport_enterprises")
+public class ZtTransportEnterprises implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
+
+	private int enterpriseId;
+
+	private Integer cityId;
+
+	private String contactPhone;
+
+	private String contacts;
+
+	private String enterpriseAbbreviation;
+
+	private String enterpriseCarCount;
+
+	private String enterpriseManagerNumber;
+
+	private String enterpriseName;
+
+	private String fenceEnclosure;
+
+	private String grossTonnage;
+
+	private String legalPersonPhone;
+
+	private String legalRepresentative;
+
+	private String newcarNumber;
+
+	private String officeSpace;
+
+	private String oldcarNumber;
+
+	private String parkingArea;
+
+	private String parkingLotFence;
+
+	private String region;//区域名
+	
+	private String districtId;//区域ID
+	
+	private String registeredCapital;
+	
+	private String address;
+	
+	private String performanceDescription;
+	
+	private String enterpriseState; //企业状态 0：以准入 1：已变更 2：已注销
+	
+	private String rpprovalNumber;//核准证编号
+	
+	private ZtDistrict ztDistrict;//区域
+	
+	private Integer CompanyCarCount;//运输公司车辆数
+}

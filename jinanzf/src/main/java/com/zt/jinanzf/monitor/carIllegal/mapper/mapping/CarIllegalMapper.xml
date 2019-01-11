@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.carIllegal.mapper.CarIllegalMapper">
+	<select id="getAllCarIllegalCount" resultType="int">
+		select count(*) from zt_infringe_info
+	</select>
+	<select id="getNewCarIllegalListForPage" resultType="com.zt.jinanzf.monitor.carIllegal.model.ZtInfringeInfo">
+		select * from zt_infringe_info 
+		<if test="null != infringeUnit and infringeUnit != ''">
+					where infringe_unit like '%${infringeUnit}%'
+		</if>
+	</select>
+	<select id="getCarIllegalInfo" resultType="com.zt.jinanzf.monitor.carIllegal.model.ZtInfringeInfo">
+		select * from zt_infringe_info WHERE id = #{id}
+	</select>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.process.mapper.ProcessMapper">
+	<select id="getMyWorkingList" resultType="com.zt.jinanzf.monitor.process.model.ZtFlowLogVo">
+			select * from
+			 (select caseGUID,(SELECT entity_name from zt_module_entity  where entity_id = instance_id and city_id= 
+				${cityId}) as entityName,
+				current_task_name as currentTaskName,
+				current_task_user as currentTaskUser,
+				date_format(target_time, '%Y-%m-%d %H:%i:%s') as targetTime,
+				target_task_name as targetTaskName,
+				(SELECT page_url from zt_module_node where task_id = target_task_id and entity_id=instance_id and city_id=  ${cityId})taskUrl,
+				log_id logId 
+			from 
+				zt_flow_log  
+			where 
+			 	log_id in (select max(log_id) from zt_flow_log  group by CaseGUID) and  
+				 target_task_user =  "${username}" 
+			and 
+				 city_id= ${cityId}  )  uv
+			where 1 = 1 
+			<if test="null != upPreson and upPreson != ''">
+				and currentTaskUser='%${upPreson}'
+			</if>
+			<if test="null != currentName and currentName != ''">
+				 and currentTaskName like '%${currentName}%' 
+			</if> 
+			ORDER BY targetTime desc
+	</select>
+	<select id="getMyEndWorkingList" resultType="com.zt.jinanzf.monitor.process.model.ZtFlowLogVo">
+		select * from (select caseGUID,
+		(SELECT entity_name FROM zt_module_entity WHERE entity_id = instance_id AND city_id = 
+					${cityId} ) as entityName, 
+					current_task_name as currentTaskName, 
+					current_task_user as currentTaskUser,
+					date_format(target_time, '%Y-%m-%d %H:%i:%s') as targetTime,
+					target_task_name as targetTaskName,
+					( SELECT page_url FROM zt_module_node WHERE task_id = target_task_id AND entity_id = instance_id AND city_id = ${cityId}) taskUrl,
+					log_id as logId 
+					from zt_flow_log where CaseGUID in (select CaseGUID from zt_flow_log where (current_task_user = 
+					 "${username}"  or  target_task_user =  "${username}" ) GROUP BY CaseGUID)
+					and log_id in(select log_id from zt_flow_log where log_id in (SELECT	max(log_id)	FROM zt_flow_log GROUP BY	CaseGUID)
+					and target_task_user= 'undefined' ) GROUP BY CaseGUID) vu where 1 = 1 
+					<if test="null != entityName and entityName != ''">
+				and entityName like '%${entityName}%'
+			</if>
+			<if test="null != upPreson and upPreson != ''">
+				and currentTaskUser='%${upPreson}'
+			</if>
+			<if test="null != currentName and currentName != ''">
+				 and currentTaskName like '%${currentName}%' 
+			</if> 
+			ORDER BY targetTime desc
+	</select>
+</mapper>

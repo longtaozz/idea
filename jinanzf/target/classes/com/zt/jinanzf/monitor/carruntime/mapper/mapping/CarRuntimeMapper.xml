@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.carruntime.mapper.CarRuntimeMapper">
+	<select id="selectCarRuntime" resultType="com.zt.jinanzf.monitor.carruntime.model.CarRuntime"
+		parameterType="java.util.Map">
+		select
+		*
+		from
+		zt_car_runtime
+		where 
+		1=1
+		<if test="str.size>0 ">
+		AND car_number in 
+			<foreach collection="str" item="numberPlate" open="("
+				separator="," close=")">
+				#{numberPlate}
+			</foreach>
+		</if>
+		AND (car_number != '' or car_number != null)
+		<if test="isOnline == 1">
+		AND online_state != 0
+		</if>
+		AND
+		send_datetime in(select MAX(send_datetime) from zt_car_runtime
+		GROUP
+		BY(car_number))
+	</select>
+		<!-- 统计正常车辆数量 -->
+		<select id="getCarRuntimeTotal" resultType="int"    parameterType="java.util.Map">
+			SELECT
+				COUNT(*)
+			FROM
+				zt_car_runtime
+			WHERE
+				1 = 1
+			AND online_state != 0
+			AND car_number != ''
+			ORDER BY
+				car_number
+		</select>
+		
+		<select id="getCarRuntime" resultType="com.zt.jinanzf.monitor.carruntime.model.CarRuntime"
+		parameterType="java.util.List">
+		select
+		*
+		from
+		zt_car_runtime
+		where
+		1=1
+		AND (car_number != '' or car_number != null)
+		<if test="null != onlineState and onlineState != ''">
+			and online_state =#{onlineState}
+		</if>
+		AND
+		send_datetime in(select MAX(send_datetime) from zt_car_runtime
+		GROUP
+		BY(car_number))
+	</select>
+	<!-- 获取所有车辆实时信息 -->
+	<select id="selectAllCarRuntime" resultType="com.zt.jinanzf.monitor.carruntime.model.CarRuntime">
+		select * 
+			from zt_car_runtime 
+		where 
+			online_state != 0 
+		AND 
+			(car_number != '' or car_number != null) 
+		AND 
+			gps_speed &gt; 29 
+		AND 
+			box_close = 1 
+		group by 
+			car_number
+	</select>
+</mapper>

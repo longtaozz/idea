@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.buildunit.mapper.BuildUnitMapper">
+	<select id="getBuildById" parameterType="Integer" resultType="com.zt.jinanzf.monitor.buildunit.model.ZtBuildunit">
+		select * from zt_buildunit WHERE build_id=#{buildId}
+	</select>
+</mapper>

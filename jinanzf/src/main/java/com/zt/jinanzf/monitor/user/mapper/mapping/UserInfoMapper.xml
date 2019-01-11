@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.user.mapper.UserInfoMapper">
+	<!-- 查询user信息 -->
+	<select id="getUserInfo" resultType="com.zt.jinanzf.monitor.user.model.User">
+	SELECT
+		user_id AS userId,
+		city_id AS cityId,
+		district_id AS districtId,
+		username AS username,
+		real_name AS realName,
+		sex AS sex,
+		dept_id AS deptId,
+		enterprise_id AS enterpriseId
+	FROM
+		zt_user
+	WHERE user_id=#{uid}
+	</select>
+	<select id="queryPwd" resultType="com.zt.jinanzf.monitor.user.model.User"
+		parameterType="String">
+		select
+			user_id as userId,
+			password as password,
+			username as username,
+			real_name as realName,
+			city_id as cityId,
+			mobile as mobile,
+			enterprise_id as enterpriseId,
+			sex as sex
+		from
+			zt_user a
+		where
+			a.username = #{username}
+	</select>
+	<select id="queryUserInfo" resultType="com.zt.jinanzf.monitor.user.model.User"
+		parameterType="String">
+		select
+			password as password,
+			username as username,
+			real_name as realName,
+			city_id as cityId,
+			mobile as mobile,
+			sex as sex,
+			enterprise_id as enterpriseId
+		from
+			zt_user
+		where
+			uid = #{uid} 
+		<if test="cityId != null and cityId != ''">
+			and 
+				city_id = #{cityId}
+		</if>
+		<if test="userId != null and userId != ''">
+			and 
+				platform_uid = #{userId}
+		</if>
+	</select>
+	<update id="modifyPwd" parameterType="String">
+		UPDATE
+			zt_user
+		SET
+			password = #{passwords}
+		where
+			username = #{userName}
+	</update>
+
+	<select id="queryRole" resultType="com.zt.jinanzf.monitor.user.model.Role"
+		parameterType="Integer">
+		select
+		*
+		from
+		zt_role r
+		where
+		r.id in (select u.role_id from
+		zt_role_user u where u.user_id = #{userId})
+	</select>
+</mapper>

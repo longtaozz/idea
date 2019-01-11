@@ -1,0 +1,62 @@
+package com.zt.jinanzf.monitor.push.model;
+
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
+import lombok.Data;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 推送用户信息
+ */
+@Builder
+@Data
+@TableName(value = "app_push_user")
+public class PushUser implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键id
+     */
+    @TableId(type=IdType.AUTO)
+    @Id
+    private Integer pushUserId;
+    /**
+     * 用户id
+     */
+    private Integer userId;
+    //设备品牌
+    private String pushBrand;
+    //设备标识
+    private String pushIdentify;
+    /**
+     * 华为推送token
+     */
+    private String pushToken;
+    /**
+     * 推送用户创建或更新时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date pushTime;
+
+    public PushUser() {
+    }
+
+    public PushUser(Integer pushUserId, Integer userId, String pushBrand, String pushIdentify, String pushToken, Date pushTime) {
+        this.pushUserId = pushUserId;
+        this.userId = userId;
+        this.pushBrand = pushBrand;
+        this.pushIdentify = pushIdentify;
+        this.pushToken = pushToken;
+        this.pushTime = pushTime;
+    }
+}

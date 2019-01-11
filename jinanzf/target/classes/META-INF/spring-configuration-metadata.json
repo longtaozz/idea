@@ -1,0 +1,18 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.zt.jinanzf.common.conf.MybatisPlusConfig",
+      "name": "spring.datasource.gateway",
+      "sourceMethod": "gateway()",
+      "type": "javax.sql.DataSource"
+    },
+    {
+      "sourceType": "com.zt.jinanzf.common.conf.MybatisPlusConfig",
+      "name": "spring.datasource.jinan",
+      "sourceMethod": "zhatu()",
+      "type": "javax.sql.DataSource"
+    }
+  ],
+  "properties": []
+}

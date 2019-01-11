@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.notice.mapper.NoticeMapper">
+	<select id="queryNoticeContent" resultType="com.zt.jinanzf.monitor.notice.model.Notice">
+		SELECT * FROM zt_notice order by notice_id
+	</select>
+</mapper>

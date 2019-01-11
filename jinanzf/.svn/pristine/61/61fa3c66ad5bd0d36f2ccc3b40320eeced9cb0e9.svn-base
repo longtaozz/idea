@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.company.mapper.CompanyMapper">
+<!-- 查询公司数量 -->
+	<select id="getAllCompanyCount" resultType="int">
+		select count(*) from zt_transport_enterprises 
+		where 
+			enterprise_state in (0,1)
+		<if test="null != enterpriseId and enterpriseId != ''">
+			and 
+				enterpriseId = #{enterpriseId}
+		</if>
+	</select>
+	<!-- 查询公司信息 -->
+	<select id="queryCompany" resultType="com.zt.jinanzf.monitor.company.model.ZtTransportEnterprises">
+		select * from zt_transport_enterprises where enterprise_id = #{enterpriseId} 
+		AND 
+			enterprise_state in (0,1)
+		<if test="null != cityId and cityId != ''">
+			and 
+				city_id = #{cityId}
+		</if>
+	</select>
+	<!-- 查询运输公司数据 -->
+	<select id="getNewCompanyListForPage" resultType="com.zt.jinanzf.monitor.company.model.ZtTransportEnterprises">
+		select * from 
+			zt_transport_enterprises 
+		where 
+			1=1 
+		and 
+			enterprise_state in(0,1) 
+		<if test="null != enterpriseName and enterpriseName != ''">
+		and enterprise_name like'%${enterpriseName}%'
+		</if>
+		order by enterprise_id desc
+	</select>
+	<select id="getCompanyCarCount" resultType="int">
+	select 
+		COUNT(*) 
+	from 
+		zt_car c 
+	inner join 
+		zt_transport_enterprises t on t.enterprise_id = c.enterprise_id 
+	where 
+		c.enterprise_id = #{enterpriseId}
+	and 
+		c.car_register = 1
+	</select>
+	<!-- 查询指定运输公司车辆   及 车辆数量-->
+	<select id="getCompanyCarInfo" resultType="com.zt.jinanzf.monitor.car.model.Car">
+	select 
+		* ,
+		count(*) as carCount
+	from
+		zt_car 
+	where 
+		enterprise_id = #{enterpriseId}
+	</select>
+	<select id="getCompanyCardInfo" resultType="com.zt.jinanzf.monitor.card.model.Card">
+	SELECT
+	car_id AS carId,
+	number_plate AS numberPlate,
+	enterprise_id AS enterpriseId,
+	car_owners_contact AS carOwnersContact,
+	car_owners_name AS carOwnersName,
+	car_type AS carType
+	FROM
+	zt_car
+	where 1=1
+	 <if test="null != enterpriseId and enterpriseId != ''">
+		and	tran_id = #{enterpriseId}
+	</if>
+	</select>
+	<select id="getCompanyConsappInfo" resultType="com.zt.jinanzf.monitor.consapp.model.ConsappVo">
+		select 
+			* 
+		from 
+			zt_consapp 
+		where 
+			trans_id = #{enterpriseId}
+	</select>
+</mapper>

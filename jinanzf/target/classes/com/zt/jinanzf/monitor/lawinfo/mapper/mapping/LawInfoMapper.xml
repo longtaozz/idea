@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.lawinfo.mapper.LawInfoMapper">
+	<select id="myLawInfo" resultType="com.zt.jinanzf.monitor.lawinfo.model.ZtLawInfoCollect">
+		select * from zt_lawinfo_collect where person_name = #{username}
+	</select>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.gpsfence.mapper.GpsfenceMapper">
+	<select id="getUnloadingGpsfence" parameterType="java.util.Map" resultType="com.zt.jinanzf.monitor.gpsfence.model.Gpsfence">
+		SELECT
+			a.*,
+			b.unloading_id as unloadingId,
+			b.district_id as proBelong,
+			b.buildunit_id as buildunitId
+		FROM
+			zt_gpsfence a
+		inner JOIN 
+			zt_unloading_area b on a.guid_fence = b.enclosure_id 
+		and b.unloading_backfill != '封场'
+		<if test="unloadingName != null and unloadingName != ''">
+			and 
+				unloading_name like '%${unloadingName}%'
+		</if>
+	</select>
+	<select id="getConsappGpsfence" parameterType="java.util.Map" resultType="com.zt.jinanzf.monitor.gpsfence.model.Gpsfence">
+		SELECT
+			*,
+			consapp_id as consappId,
+			pro_belong as proBelong
+		FROM 
+			zt_gpsfence a
+		inner JOIN 
+			zt_consapp b on a.guid_fence = b.gong_guid_fence 	
+		<if test="proName != null and proName != ''">
+				and pro_name like '%${proName}%'
+		</if>
+	</select>
+	<select id="getFenceByGuid" resultType="com.zt.jinanzf.monitor.gpsfence.model.Gpsfence">
+		select * from zt_gpsfence where guid_fence = #{guidFence}
+	</select>
+</mapper>

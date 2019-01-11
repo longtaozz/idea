@@ -1,0 +1,8 @@
+package com.zt.jinanzf.monitor.lawinfo.mapper;
+
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zt.jinanzf.monitor.lawinfo.model.ZtLawInfoCollect;
+
+public interface LawInfoMapper extends BaseMapper<ZtLawInfoCollect>{
+
+}

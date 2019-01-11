@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.version.mapper.VersionMapper">
+	<select id="queryAppUpdateInfo" resultType="com.zt.jinanzf.monitor.version.model.AppUpdate">
+		select 
+			app_id as appId,
+			app_code as appCode,
+			app_name as appName,
+			version_milepost as versionMilepost,
+			version_code as versionCode,
+			version_code_before as versionCodeBefore,
+			version_type as versionType,
+			version_big as versionBig,
+			download_url as downloadUrl,
+			update_title as updateTitle,
+			update_message as updateMessage,
+			status_number as statusNumber,
+			create_time as createTime,
+			update_params as updateParams 
+		from 
+			zt_app_update_message
+		where 
+			1 = 1 
+		and 
+			 create_time 
+		in
+			(select Max(create_time) from zt_app_update_message)
+	</select>
+	<select id="insertAppUpdateInfo">
+		insert into 
+			zt_app_update_message
+				(download_url,update_title,update_message,version_code,create_time,version_type) 
+		values
+			(#{downloadUrl},#{updateTitle},#{updateMessage},#{versionCode},NOW(),#{versionType})
+	
+	</select>
+</mapper>

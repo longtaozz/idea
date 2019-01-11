@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.card.mapper.CardMapper">
+	<!-- 根据运输公司id统计核准证 -->
+	<select id="getTotalCard" resultType="int" parameterType="java.util.Map">
+		select   COUNT(card_id)   from zt_card WHERE  1=1 
+	<if test="null != enterpriseId and enterpriseId != ''">
+		AND  tran_id = #{enterpriseId}
+	</if>
+	<if test="null != effective and effective == 1"><!-- 查询有效得核准证 -->
+		AND  tran_endtime >=NOW()
+	</if>
+	</select>	
+	 	<!-- 查询指定运输公司车辆 -->
+	<select id="getEnterpriseCardPlate" resultType="com.zt.jinanzf.monitor.card.model.Card" parameterType="java.util.Map">
+		
+		SELECT
+			c.card_id AS cardId,
+			c.tran_carids AS tranCarids,
+			c.pro_name AS proName,
+			c.tran_starttime AS tranStarttime,
+			c.tran_endtime AS tranEndtime,
+		  	c.xiaona_fencename AS xiaonaFencename,
+			c.lic_number  AS licNumber
+		FROM
+			zt_card AS c
+		where 1=1 
+	 <if test="null != enterpriseId and enterpriseId != ''">
+			and
+			c.tran_id =#{enterpriseId}
+	</if>
+	<if test="null != effective and effective == 1"><!-- 查询有效得核准证 -->
+		  and
+		 c.tran_endtime >=NOW()
+	</if>
+	<if test="null != proName and proName != ''">
+			and
+			c.pro_name
+			like
+			'%${proName}%'
+		</if>
+	</select>
+	
+	<select id="getCardInfoById" resultType="com.zt.jinanzf.monitor.card.model.SaoCard">
+	SELECT c.card_id cardId , c.pro_name proName,c.construction_address proAddress,tran_id tranId, tran_carids numberPlate, 
+				 (SELECT admit_number FROM zt_car WHERE number_plate = numberPlate) admitNumber, 
+				 (SELECT car_id FROM zt_car WHERE number_plate = numberPlate) carId, 
+				 (select enterprise_name from zt_transport_enterprises where enterprise_id = tran_id) enterpriseName,
+				 (select enterprise_abbreviation from zt_transport_enterprises where enterprise_id = tran_id) abbreviation, 
+				 tran_starttime tranStarttime,tran_endtime tranEndtime,lic_starttime licStarttime,lic_endtime licEndtime, 
+			 loadInfo loadInfo,xiaona_fencename xiaonaFencename,gong_fencename gongFencename,loadState loadState FROM zt_card c WHERE card_id =#{cardId}
+	</select>
+	<select id="getCarValidlCard" resultType="com.zt.jinanzf.monitor.card.model.Card">
+		select 
+			c.card_id AS cardId,
+			c.tran_carids AS tranCarids,
+			c.pro_name AS proName,
+			c.tran_starttime AS tranStarttime,
+			c.tran_endtime AS tranEndtime,
+		  	c.xiaona_fencename AS xiaonaFencename,
+			c.lic_number  AS licNumber
+		FROM
+			zt_card AS c 
+		where 1=1
+		<if test="null != effective and effective == 1"><!-- 查询有效得核准证 -->
+		  and
+		 	c.tran_endtime >=NOW() 
+		 	ORDER BY create_time limit 0,2
+		</if>
+		
+	</select>
+</mapper>

@@ -1,0 +1,53 @@
+/** 
+ *@Project: jinan-service 
+ *@Author: YangXiao
+ *@Date: 2018年9月27日 
+ *@Copyright: ©2016-2022 http://www.zhtkj.com Inc. All rights reserved. 
+ */    
+package com.zt.jinanzf.monitor.card.service;
+
+import java.util.Map;
+
+import com.baomidou.mybatisplus.plugins.Page;
+import com.zt.jinanzf.monitor.card.model.Card;
+
+/**
+ * ClassName: CardService 
+ * @Description: TODO
+ * @author YangXiao
+ * @date 2018年9月27日
+ */
+
+public interface CardService {
+	
+	/**
+	 * 根据map值统计核准证数
+	 * @Description: TODO
+	 * @param map
+	 * @return   
+	 * @return int  
+	 * @throws  
+	 * @author YangXiao
+	 * @date 2018年9月27日
+	 */
+	int   getTotalCard(Map<String, Object > map  );
+	
+	
+	/**
+	 * 查詢指定公司有效核准証信息
+	 * @Description: TODO
+	 * @param page
+	 * @param param
+	 * @return   
+	 * @return Page<Card>  
+	 * @throws
+	 * @author YangXiao
+	 * @date 2018年9月28日
+	 */
+	Page<Card> getEnterpriseCardPlate(Page<Card> page,Map<String,Object> param);
+	
+	/**
+	 * 根据cardId 查询card信息
+	 */
+	Card getCardInfoById(String cardId);
+}

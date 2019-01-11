@@ -1,0 +1,29 @@
+/** 
+ *@Project: jinan-service 
+ *@Author: chenlijun
+ *@Date: 2018年10月8日 
+ *@Copyright: ©2016-2022 http://www.zhtkj.com Inc. All rights reserved. 
+ */    
+package com.zt.jinanzf.monitor.assess.service;
+
+import java.util.List;
+
+import com.zt.jinanzf.monitor.assess.model.ZtAssess;
+
+/**
+ * ClassName: AssessService 
+ * @Description: TODO
+ * @author chenlijun
+ * @date 2018年10月8日
+ */
+
+public interface AssessService {
+	/**
+	 * 
+	 * @Description:获取考核评估表信息
+	 * @return List<ZtAssess>  
+	 * @author chenlijun
+	 * @date 2018年10月8日
+	 */
+	List<ZtAssess> queryAssessList();
+}

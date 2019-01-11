@@ -1,0 +1,51 @@
+/** 
+ *@Project: jinan-service 
+ *@Author: chenlijun
+ *@Date: 2018年9月18日 
+ *@Copyright: ©2016-2022 http://www.zhtkj.com Inc. All rights reserved. 
+ */    
+package com.zt.jinanzf.monitor.unloading.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.plugins.Page;
+import com.zt.jinanzf.monitor.unloading.mapper.UnloadingMapper;
+import com.zt.jinanzf.monitor.unloading.model.Unloading;
+import com.zt.jinanzf.monitor.unloading.service.UnloadingService;
+
+
+/**
+ * ClassName: UnloadingServiceImpl 
+ * @Description: TODO
+ * @author chenlijun
+ * @date 2018年9月18日
+ */
+
+@Service
+public class UnloadingServiceImpl implements UnloadingService {
+	
+	@Autowired
+	UnloadingMapper unloadingMapper;
+	
+	public Integer getUnloadingAreaCount(){
+		return unloadingMapper.getUnloadingAreaCount();
+	}
+
+	public Page<Unloading> getNewUnloadingListForPage(Page<Unloading> page, Map<?, ?> params) {
+		
+		return page.setRecords(unloadingMapper.getNewUnloadingListForPage(page, params));
+	}
+	
+	public Unloading getUnloadingInfo(Map<?,?> params){
+		Unloading unloading = null;
+		List<Unloading> unloadingList = unloadingMapper.getUnloadingInfo(params);
+		if(null != unloadingList && unloadingList.size() > 0){
+			unloading = unloadingList.get(0);
+		}
+		return unloading;
+	}
+}

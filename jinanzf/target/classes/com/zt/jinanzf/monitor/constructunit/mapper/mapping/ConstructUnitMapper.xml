@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.constructunit.mapper.ConstructUnitMapper">
+	<select id="getConstructUnit" resultType="com.zt.jinanzf.monitor.constructunit.model.ZtConstructUnit">
+		select * from zt_construct_unit 
+		<if test="null != constructUnitId and constructUnitId != ''">
+		where 
+		construct_unit_id = #{constructUnitId}
+			
+		</if>
+		<if test="null != cityId and cityId != ''">
+		and 
+			city_id = #{cityId}
+		</if>
+	</select>
+</mapper>

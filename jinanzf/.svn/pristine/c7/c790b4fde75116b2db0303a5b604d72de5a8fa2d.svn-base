@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.record.mapper.PushRecordMapper">
+		<select id="getPushRecordVo" resultType="com.zt.jinanzf.monitor.record.model.PushRecord">	
+		SELECT
+	r.push_record_id AS pushRecordId,
+	r.push_genre_id AS pushGenreId,
+	g.push_genre_name AS pushGenreName,
+	r.push_record_title AS pushRecordTitle,
+	r.push_record_content AS pushRecordContent,
+	r.push_record_time AS pushRecordTime,
+	r.quilt_user_id as quiltUserId,
+	r.user_id AS userId,
+	real_name AS realName,
+	r.push_state AS pushState,
+	r.push_data_id AS pushDataId
+FROM
+	app_push_record AS r
+LEFT JOIN zt_user AS u ON r.user_id = u.user_id
+LEFT JOIN app_push_genre AS g ON r.push_genre_id = g.push_genre_id
+		
+WHERE 
+	1 = 1 
+	<if test="null != quiltUserId and quiltUserId != ''">
+		and
+			 r.quilt_user_id = #{quiltUserId}
+	</if>
+	<if test="null != userId and userId != ''" >
+		and 
+			r.user_id = #{userId}
+	</if>
+	<if test="null != pushRecordId and pushRecordId != ''">
+		and 
+			r.push_record_id = #{pushRecordId}
+	</if> 
+	<if test="null != pushGenreId and pushGenreId != ''">
+		and 
+			r.push_genre_id =#{pushGenreId}
+	</if>
+		order by push_state asc, push_record_time desc
+		</select>
+	<insert id="setPushRecord" >
+		insert into 
+			app_push_record
+				(push_genre_id,push_record_title,push_record_content,
+				push_record_time,user_id,quilt_user_id,push_state,push_data_id) 
+		values
+			(#{pushGenreId},#{pushRecordTitle},#{pushRecordContent},
+			#{pushRecordTime},#{userId},#{quiltUserId},#{pushState},#{pushDataId})
+	
+	</insert>
+	<update id="upPushRecord"> 
+		UPDATE app_push_record SET push_state = #{pushState} WHERE push_record_id = #{pushRecordId}
+	</update>
+	
+	<select id="getZtTelChartInfo" resultType="com.zt.jinanzf.monitor.record.model.ZtTelChart">
+		select * from zt_tel_chart where 1=1 
+		<if test="null != pushDataId and pushDataId != ''">
+			and id = #{pushDataId} 
+		</if>
+	</select>
+	<select id="getPushRecordCount" resultType="int">
+	    select COUNT(*) from app_push_record where 1=1 
+	    <if test="null != quiltUserId and quiltUserId != ''">
+	    and quilt_user_id = #{quiltUserId}
+	    </if>
+	</select>
+</mapper>

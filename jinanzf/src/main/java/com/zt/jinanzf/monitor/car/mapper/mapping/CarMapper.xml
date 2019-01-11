@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zt.jinanzf.monitor.car.mapper.CarMapper">
+	<select id="selectNumberPlate" resultType="com.zt.jinanzf.monitor.car.model.Car"
+		parameterType="String">
+		select
+		a.number_plate as numberPlate
+		from
+		zt_car a
+		where
+		1=1 
+		and car_register = 1
+		<if test="null != enterpriseName and enterpriseName != ''">
+		    and enterprise_id in (select enterprise_id from zt_transport_enterprises where enterprise_name like '%${enterpriseName}%')
+		</if>
+		<if test="null != carNumber and carNumber != ''">
+			and
+			a.number_plate
+			like
+			'%${carNumber}%'
+		</if>
+	</select>
+
+	<select id="selectCarAndAll" resultType="com.zt.jinanzf.monitor.car.model.Car"
+		parameterType="java.util.Map">
+		select *,
+		(select factory_name from zt_factory where c.car_factory = factory_id) as carFactory,
+		(select equipment_name from zt_equipment e where e.equipment_id = equipment_providers) as equipmentName,
+		(select enterprise_name from zt_transport_enterprises t where t.enterprise_id = c.enterprise_id) as enterpriseName,
+		(select enterprise_abbreviation from zt_transport_enterprises t where
+		t.enterprise_id = c.enterprise_id) as enterpriseAbbreviation
+		from zt_car c where number_plate = #{carNumber} and car_register = 1
+	</select>
+	
+	<!-- 查询指定运输公司车辆 -->
+	<select id="getEnterpriseNumberPlate" resultType="com.zt.jinanzf.monitor.car.model.Car" parameterType="java.util.Map">
+			SELECT
+				a.car_id AS carId,
+				a.number_plate AS numberPlate,
+				a.car_owners_contact AS carOwnersContact,
+				a.car_owners_name AS  carOwnersName,
+				a.car_type  AS carType,
+				e.enterprise_abbreviation AS enterpriseAbbreviation
+			FROM
+				zt_car AS a
+			  LEFT JOIN  zt_transport_enterprises  AS e ON e.enterprise_id =a.enterprise_id
+			WHERE  1= 1
+			and car_register = 1
+		<if test="null != enterpriseId and enterpriseId != ''">
+			and
+			a.enterprise_id =#{enterpriseId}
+		</if>
+		<if test="null != carNumber and carNumber != ''">
+			and
+			a.number_plate
+			like
+			'%${carNumber}%'
+		</if>
+	</select>
+	<!-- 统计车辆数量 -->
+		<select id="getCarTotal" resultType="int"    parameterType="java.util.Map">
+			SELECT  COUNT(car_id)  FROM  zt_car  
+			WHERE   1=1
+			AND  car_register = 1
+	</select>
+</mapper>
